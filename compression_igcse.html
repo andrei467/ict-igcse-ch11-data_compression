@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Compression — IGCSE Computer Science Recap Grade 9</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.10.0/dist/tabler-icons.min.css">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --blue-50:#E6F1FB; --blue-100:#B5D4F4; --blue-200:#85B7EB; --blue-400:#378ADD; --blue-600:#185FA5; --blue-800:#0C447C; --blue-900:#042C53;
+    --teal-50:#E1F5EE; --teal-200:#5DCAA5; --teal-600:#0F6E56; --teal-800:#085041;
+    --amber-50:#FAEEDA; --amber-200:#EF9F27; --amber-600:#854F0B; --amber-800:#633806;
+    --coral-50:#FAECE7; --coral-200:#F0997B; --coral-600:#993C1D; --coral-800:#712B13;
+    --green-50:#EAF3DE; --green-200:#97C459; --green-600:#3B6D11; --green-800:#27500A;
+    --purple-50:#EEEDFE; --purple-200:#AFA9EC; --purple-600:#534AB7; --purple-800:#3C3489;
+    --gray-50:#F1EFE8; --gray-100:#D3D1C7; --gray-200:#B4B2A9; --gray-600:#5F5E5A;
+    --text:#1a1a1a; --text-sec:#555; --text-hint:#888;
+    --bg:#fff; --bg-sec:#f7f6f3; --border:rgba(0,0,0,0.12);
+    --radius-sm:8px; --radius-md:12px; --radius-lg:16px;
+  }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg-sec); color: var(--text); min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 2rem 1rem 4rem; }
+  .shell { width: 100%; max-width: 720px; }
+  header { text-align: center; margin-bottom: 2rem; }
+  header .topic-badge { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; background: var(--blue-50); color: var(--blue-800); padding: 4px 14px; border-radius: 20px; border: .5px solid var(--blue-200); margin-bottom: .75rem; }
+  header h1 { font-size: 28px; font-weight: 600; color: var(--text); margin-bottom: .35rem; }
+  header p { font-size: 15px; color: var(--text-sec); }
+  .progress-wrap { margin-bottom: 1.5rem; }
+  .prog-labels { display: flex; justify-content: space-between; margin-bottom: .5rem; }
+  .prog-labels span { font-size: 12px; color: var(--text-hint); }
+  .prog-track { height: 6px; background: var(--gray-100); border-radius: 3px; overflow: hidden; }
+  .prog-fill { height: 100%; background: var(--blue-400); border-radius: 3px; transition: width .4s ease; }
+  .slide-dots { display: flex; gap: 5px; margin-top: .75rem; flex-wrap: wrap; }
+  .sdot { flex: 1; min-width: 20px; height: 4px; border-radius: 2px; background: var(--gray-100); transition: background .3s; cursor: pointer; }
+  .sdot.done { background: var(--blue-200); }
+  .sdot.active { background: var(--blue-600); }
+  .card-shell { background: var(--bg); border-radius: var(--radius-lg); border: .5px solid var(--border); padding: 2rem; min-height: 360px; margin-bottom: 1.5rem; }
+  .slide { display: none; animation: fi .3s ease; }
+  .slide.visible { display: block; }
+  @keyframes fi { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+  .slabel { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--text-hint); margin-bottom: .5rem; }
+  .stitle { font-size: 24px; font-weight: 600; color: var(--text); margin-bottom: .75rem; }
+  .ssub { font-size: 15px; color: var(--text-sec); margin-bottom: 1.5rem; line-height: 1.6; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  .ic { padding: 1rem; border-radius: var(--radius-md); border: .5px solid; }
+  .ic.blue{background:var(--blue-50);border-color:var(--blue-200);}
+  .ic.teal{background:var(--teal-50);border-color:var(--teal-200);}
+  .ic.amber{background:var(--amber-50);border-color:var(--amber-200);}
+  .ic.coral{background:var(--coral-50);border-color:var(--coral-200);}
+  .ic.green{background:var(--green-50);border-color:var(--green-200);}
+  .ic.purple{background:var(--purple-50);border-color:var(--purple-200);}
+  .ic.gray{background:var(--gray-50);border-color:var(--gray-200);}
+  .ic-icon { font-size: 20px; margin-bottom: 6px; }
+  .ic-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .ic.blue .ic-title{color:var(--blue-800);}
+  .ic.teal .ic-title{color:var(--teal-800);}
+  .ic.amber .ic-title{color:var(--amber-800);}
+  .ic.coral .ic-title{color:var(--coral-800);}
+  .ic.green .ic-title{color:var(--green-800);}
+  .ic.purple .ic-title{color:var(--purple-800);}
+  .ic.gray .ic-title{color:var(--gray-600);}
+  .ic-body { font-size: 13px; color: var(--text-sec); line-height: 1.5; }
+  .hbox { background: var(--blue-50); border: .5px solid var(--blue-200); border-radius: var(--radius-md); padding: 1rem 1.25rem; margin: 1rem 0; }
+  .hbox p { font-size: 14px; color: var(--blue-800); line-height: 1.6; }
+  .do-dont { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .dd-col { border-radius: var(--radius-md); padding: 1rem; border: .5px solid; }
+  .dd-col.do{background:var(--teal-50);border-color:var(--teal-200);}
+  .dd-col.dont{background:var(--coral-50);border-color:var(--coral-200);}
+  .dd-col h3 { font-size: 13px; font-weight: 600; margin-bottom: 10px; }
+  .dd-col.do h3{color:var(--teal-800);}
+  .dd-col.dont h3{color:var(--coral-800);}
+  .dd-col ul { list-style:none; display:flex; flex-direction:column; gap:6px; }
+  .dd-col ul li { font-size: 13px; color: var(--text-sec); display:flex; gap:6px; align-items:flex-start; line-height:1.4; }
+  .rlist { list-style:none; display:flex; flex-direction:column; gap:8px; margin-top:.5rem; }
+  .rlist li { display:flex; align-items:flex-start; gap:8px; font-size:14px; color:var(--text); line-height:1.5; }
+  .rlist li i { margin-top:2px; flex-shrink:0; }
+  .qbtn { text-align:left; padding:.75rem 1rem; border-radius:var(--radius-sm); border:.5px solid var(--border); background:var(--bg); color:var(--text); font-size:14px; cursor:pointer; transition:all .15s; width:100%; margin-bottom:8px; font-family:inherit; }
+  .qbtn:hover { background:var(--bg-sec); }
+  .qbtn.correct{background:var(--green-50);border-color:var(--green-200);color:var(--green-800);font-weight:600;}
+  .qbtn.wrong{background:var(--coral-50);border-color:var(--coral-200);color:var(--coral-800);}
+  .qbtn:disabled{pointer-events:none;}
+  .feedback{margin-top:.75rem;font-size:14px;padding:.75rem 1rem;border-radius:var(--radius-sm);display:none;}
+  .feedback.show{display:block;}
+  .feedback.ok{background:var(--green-50);color:var(--green-800);border:.5px solid var(--green-200);}
+  .feedback.no{background:var(--coral-50);color:var(--coral-800);border:.5px solid var(--coral-200);}
+  .rle-demo { background: var(--gray-50); border: .5px solid var(--gray-200); border-radius: var(--radius-md); padding: 1rem 1.25rem; font-family: 'Courier New', monospace; font-size: 14px; margin: .75rem 0; }
+  .rle-before { color: var(--text-sec); margin-bottom: 6px; }
+  .rle-arrow { color: var(--blue-400); font-size: 13px; margin-bottom: 6px; }
+  .rle-after { color: var(--teal-800); font-weight: 600; }
+  .file-tag { display: inline-block; font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 20px; border: .5px solid; margin: 3px 3px 0 0; }
+  .file-tag.lossy { background: var(--coral-50); border-color: var(--coral-200); color: var(--coral-800); }
+  .file-tag.lossless { background: var(--teal-50); border-color: var(--teal-200); color: var(--teal-800); }
+  .scenario-card{padding:1rem;border-radius:var(--radius-md);border:.5px solid var(--border);background:var(--bg);margin-bottom:12px;}
+  .sc-q{font-size:14px;color:var(--text);margin-bottom:.75rem;font-weight:600;}
+  .sc-opts{display:flex;flex-wrap:wrap;gap:8px;}
+  .sc-opt{padding:6px 14px;border-radius:20px;border:.5px solid var(--border);background:transparent;font-size:13px;color:var(--text);cursor:pointer;transition:all .15s;font-family:inherit;}
+  .sc-opt:hover{background:var(--bg-sec);}
+  .sc-opt.right{background:var(--green-50);border-color:var(--green-200);color:var(--green-800);}
+  .sc-opt.wrong{background:var(--coral-50);border-color:var(--coral-200);color:var(--coral-800);}
+  .sc-fb{font-size:12px;margin-top:8px;color:var(--text-sec);display:none;}
+  .sc-fb.show{display:block;}
+  .accordion-item{border:.5px solid var(--border);border-radius:var(--radius-md);margin-bottom:8px;overflow:hidden;}
+  .accordion-btn{width:100%;text-align:left;padding:.875rem 1rem;background:var(--bg);border:none;cursor:pointer;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;font-family:inherit;}
+  .accordion-btn:hover{background:var(--bg-sec);}
+  .acc-title{font-size:14px;color:var(--text);line-height:1.5;font-weight:600;}
+  .acc-icon{font-size:16px;flex-shrink:0;color:var(--text-hint);transition:transform .2s;}
+  .acc-body{display:none;padding:0 1rem 1rem;}
+  .acc-body p{font-size:13px;color:var(--text-sec);line-height:1.6;background:var(--blue-50);border-radius:var(--radius-sm);padding:.75rem;color:var(--blue-800);}
+  .acc-body.def p{background:var(--bg-sec);color:var(--text-sec);}
+  .checklist{display:flex;flex-direction:column;gap:8px;}
+  .check-item{display:flex;align-items:center;gap:10px;padding:.75rem 1rem;border-radius:var(--radius-sm);border:.5px solid;}
+  .check-item.blue{background:var(--blue-50);border-color:var(--blue-200);}
+  .check-item.teal{background:var(--teal-50);border-color:var(--teal-200);}
+  .check-item.amber{background:var(--amber-50);border-color:var(--amber-200);}
+  .check-item.coral{background:var(--coral-50);border-color:var(--coral-200);}
+  .check-item.green{background:var(--green-50);border-color:var(--green-200);}
+  .check-item.purple{background:var(--purple-50);border-color:var(--purple-200);}
+  .check-item.gray{background:var(--gray-50);border-color:var(--gray-200);}
+  .check-item span{font-size:14px;font-weight:600;}
+  .check-item.blue span{color:var(--blue-800);}
+  .check-item.teal span{color:var(--teal-800);}
+  .check-item.amber span{color:var(--amber-800);}
+  .check-item.coral span{color:var(--coral-800);}
+  .check-item.green span{color:var(--green-800);}
+  .check-item.purple span{color:var(--purple-800);}
+  .check-item.gray span{color:var(--gray-600);}
+  .quiz-nav{display:flex;gap:6px;margin-bottom:1rem;flex-wrap:wrap;}
+  .qnav-btn{min-width:34px;padding:5px 10px;border-radius:6px;border:.5px solid var(--border);background:transparent;cursor:pointer;font-size:13px;font-family:inherit;transition:all .15s;}
+  .qnav-btn.q-done-right{background:var(--green-50);border-color:var(--green-200);color:var(--green-800);}
+  .qnav-btn.q-done-wrong{background:var(--coral-50);border-color:var(--coral-200);color:var(--coral-800);}
+  .score-box{text-align:center;padding:1.5rem;border-radius:var(--radius-md);background:var(--bg-sec);border:.5px solid var(--border);margin-top:1.5rem;}
+  .score-num{font-size:52px;font-weight:700;color:var(--blue-600);}
+  .score-lbl{font-size:14px;color:var(--text-sec);margin-top:4px;}
+  .clue-btn{display:inline-flex;align-items:center;gap:5px;font-size:12px;padding:5px 12px;border-radius:20px;border:.5px solid;background:transparent;cursor:pointer;margin:4px 4px 0 0;transition:all .15s;font-family:inherit;}
+  .clue-btn.info{border-color:var(--blue-200);color:var(--blue-800);}
+  .clue-btn.info.selected{background:var(--blue-50);}
+  .clue-res{margin-top:1rem;font-size:14px;padding:.75rem 1rem;border-radius:var(--radius-sm);display:none;}
+  .clue-res.show{display:block;}
+  .nav { display:flex; align-items:center; justify-content:space-between; }
+  .nbtn { display:flex; align-items:center; gap:6px; padding:10px 20px; border-radius:var(--radius-sm); border:.5px solid var(--border); background:var(--bg); color:var(--text); font-size:14px; cursor:pointer; transition:all .15s; font-family:inherit; font-weight:500; }
+  .nbtn:hover { background:var(--bg-sec); }
+  .nbtn:disabled { opacity:.3; cursor:default; }
+  .nctr { font-size:13px; color:var(--text-hint); font-weight:500; }
+  table { width:100%; border-collapse:collapse; font-size:13px; margin-top:.75rem; }
+  th { background:var(--bg-sec); border:.5px solid var(--border); padding:.6rem .75rem; font-weight:600; color:var(--text); text-align:left; }
+  td { border:.5px solid var(--border); padding:.6rem .75rem; color:var(--text-sec); vertical-align:top; line-height:1.5; }
+  tr:nth-child(even) td { background:var(--bg-sec); }
+  .exam-q-card { border:.5px solid var(--border); border-radius:var(--radius-md); padding:1rem 1.25rem; margin-bottom:1rem; }
+  .exam-q-text { font-size:14px; font-weight:600; color:var(--text); margin-bottom:.75rem; line-height:1.5; }
+  .exam-q-marks { font-size:11px; color:var(--text-hint); margin-bottom:.75rem; }
+  .exam-textarea { width:100%; border:.5px solid var(--border); border-radius:var(--radius-sm); padding:.75rem; font-size:13px; font-family:inherit; color:var(--text); background:var(--bg-sec); resize:vertical; min-height:80px; outline:none; transition:border-color .15s; }
+  .exam-textarea:focus { border-color:var(--blue-400); }
+  .reveal-btn { margin-top:.6rem; display:inline-flex; align-items:center; gap:5px; font-size:12px; padding:5px 12px; border-radius:20px; border:.5px solid var(--blue-200); background:transparent; color:var(--blue-800); cursor:pointer; font-family:inherit; transition:all .15s; }
+  .reveal-btn:hover { background:var(--blue-50); }
+  .ms-box { margin-top:.75rem; background:var(--green-50); border:.5px solid var(--green-200); border-radius:var(--radius-sm); padding:.75rem 1rem; font-size:13px; color:var(--green-800); line-height:1.6; display:none; }
+  .ms-box.show { display:block; }
+  .ms-box .ms-point::before { content:"✓ "; font-weight:600; }
+  @media(max-width:520px){
+    .grid2,.grid3,.do-dont{grid-template-columns:1fr;}
+    .card-shell{padding:1.25rem;}
+    header h1{font-size:22px;}
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+  <header>
+    <div class="topic-badge">IGCSE Computer Science Recap</div>
+    <h1>Data Compression</h1>
+    <p>Grade 9 &nbsp;·&nbsp; Interactive Revision Presentation</p>
+  </header>
+
+  <div class="progress-wrap">
+    <div class="prog-labels">
+      <span id="slide-name">Introduction</span>
+      <span id="slide-frac">1 / 14</span>
+    </div>
+    <div class="prog-track"><div class="prog-fill" id="prog-fill" style="width:7.14%"></div></div>
+    <div class="slide-dots" id="slide-dots"></div>
+  </div>
+
+  <div class="card-shell">
+    <div id="slides-wrap"></div>
+  </div>
+
+  <div class="nav">
+    <button class="nbtn" id="prev-btn" onclick="navigate(-1)" disabled>
+      <i class="ti ti-arrow-left"></i> Previous
+    </button>
+    <span class="nctr" id="nav-ctr">1 / 14</span>
+    <button class="nbtn" id="next-btn" onclick="navigate(1)">
+      Next <i class="ti ti-arrow-right"></i>
+    </button>
+  </div>
+</div>
+
+<script>
+const slides = [
+  {
+    name: "Introduction",
+    html: `
+      <p class="slabel">Unit: Data Representation</p>
+      <p class="stitle">Data Compression</p>
+      <p class="ssub">Compression is the process of reducing the size of a file so it can be stored more efficiently or transmitted more quickly across a network.</p>
+      <div class="grid3">
+        <div class="ic blue">
+          <div class="ic-icon"><i class="ti ti-device-mobile"></i></div>
+          <div class="ic-title">Storage</div>
+          <div class="ic-body">Maximise data stored on phones, tablets and drives</div>
+        </div>
+        <div class="ic teal">
+          <div class="ic-icon"><i class="ti ti-wifi"></i></div>
+          <div class="ic-title">Transfer</div>
+          <div class="ic-body">Minimise upload, download and streaming time</div>
+        </div>
+        <div class="ic amber">
+          <div class="ic-icon"><i class="ti ti-photo"></i></div>
+          <div class="ic-title">Images</div>
+          <div class="ic-body">Reduce size by lowering colour depth or resolution</div>
+        </div>
+      </div>
+      <div class="hbox" style="margin-top:1.25rem;">
+        <p><i class="ti ti-info-circle" style="margin-right:6px"></i>Compression is achieved using two methods: <strong>Lossy</strong> and <strong>Lossless</strong>. Choosing the right one depends on whether quality loss is acceptable.</p>
+      </div>
+    `
+  },
+  {
+    name: "Lossy compression",
+    html: `
+      <p class="slabel">Compression Methods</p>
+      <p class="stitle">Lossy Compression</p>
+      <p class="ssub">Lossy compression permanently removes data to reduce file size. Once compressed, the original cannot be restored.</p>
+      <div class="grid2" style="margin-bottom:1rem;">
+        <div class="ic coral">
+          <div class="ic-icon"><i class="ti ti-trash"></i></div>
+          <div class="ic-title">Data is removed</div>
+          <div class="ic-body">Some data is permanently deleted to make the file smaller. This process is irreversible.</div>
+        </div>
+        <div class="ic amber">
+          <div class="ic-icon"><i class="ti ti-arrows-minimize"></i></div>
+          <div class="ic-title">Great size reduction</div>
+          <div class="ic-body">Can greatly reduce file size, but at the expense of quality.</div>
+        </div>
+      </div>
+      <p style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:8px;">How it works on images:</p>
+      <ul class="rlist" style="margin-bottom:1rem;">
+        <li><i class="ti ti-color-swatch" style="color:var(--coral-600);font-size:16px"></i>Similar colours are grouped together, reducing the total number of colours</li>
+        <li><i class="ti ti-eye" style="color:var(--coral-600);font-size:16px"></i>The quality reduction may be difficult to visually notice</li>
+        <li><i class="ti ti-file-minus" style="color:var(--coral-600);font-size:16px"></i>File sizes drop dramatically, making sharing and storing easier</li>
+      </ul>
+      <p style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:8px;">Common lossy file formats:</p>
+      <span class="file-tag lossy">.JPEG</span>
+      <span class="file-tag lossy">.MP3</span>
+      <span class="file-tag lossy">.MPEG-4</span>
+    `
+  },
+  {
+    name: "Lossless compression",
+    html: `
+      <p class="slabel">Compression Methods</p>
+      <p class="stitle">Lossless Compression</p>
+      <p class="ssub">Lossless compression encodes data to reduce file size without permanently removing anything. The original file can be fully restored.</p>
+      <div class="grid2" style="margin-bottom:1rem;">
+        <div class="ic teal">
+          <div class="ic-icon"><i class="ti ti-rotate"></i></div>
+          <div class="ic-title">Reversible</div>
+          <div class="ic-body">The decompression process reverses the algorithm and returns the file to its exact original state.</div>
+        </div>
+        <div class="ic blue">
+          <div class="ic-icon"><i class="ti ti-search"></i></div>
+          <div class="ic-title">Finds patterns</div>
+          <div class="ic-body">Algorithms scan for repeated patterns and replace them with shorter representations.</div>
+        </div>
+      </div>
+      <p style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px;">Run-Length Encoding (RLE) — example:</p>
+      <div class="rle-demo">
+        <div class="rle-before">Before: &nbsp;EEEEEAAABBB</div>
+        <div class="rle-arrow">↓ &nbsp;repeating characters replaced with character + count</div>
+        <div class="rle-after">After: &nbsp;&nbsp;E5A3B3</div>
+      </div>
+      <p style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:8px;">Common lossless file formats:</p>
+      <span class="file-tag lossless">.PNG</span>
+      <span class="file-tag lossless">.ZIP</span>
+      <span class="file-tag lossless">.RAR</span>
+    `
+  },
+  {
+    name: "Lossy vs Lossless",
+    html: `
+      <p class="slabel">Comparison</p>
+      <p class="stitle">Lossy vs Lossless</p>
+      <p class="ssub">Understanding when to use each type is a common exam question. The key factor is whether any quality loss is acceptable.</p>
+      <div class="do-dont" style="margin-bottom:1rem;">
+        <div class="dd-col dont">
+          <h3><i class="ti ti-trash" style="margin-right:4px"></i> Lossy</h3>
+          <ul>
+            <li><i class="ti ti-point" style="font-size:10px;margin-top:4px;color:var(--coral-600)"></i>Data is permanently removed</li>
+            <li><i class="ti ti-point" style="font-size:10px;margin-top:4px;color:var(--coral-600)"></i>Irreversible — original cannot be restored</li>
+            <li><i class="ti ti-point" style="font-size:10px;margin-top:4px;color:var(--coral-600)"></i>Greater file size reduction</li>
+            <li><i class="ti ti-point" style="font-size:10px;margin-top:4px;color:var(--coral-600)"></i>Only suitable where quality loss is acceptable</li>
+            <li><i class="ti ti-point" style="font-size:10px;margin-top:4px;color:var(--coral-600)"></i>Used for: images, audio, video</li>
+          </ul>
+        </div>
+        <div class="dd-col do">
+          <h3><i class="ti ti-lock" style="margin-right:4px"></i> Lossless</h3>
+          <ul>
+            <li><i class="ti ti-point" style="font-size:10px;margin-top:4px;color:var(--teal-600)"></i>No data is permanently removed</li>
+            <li><i class="ti ti-point" style="font-size:10px;margin-top:4px;color:var(--teal-600)"></i>Reversible — original can be fully restored</li>
+            <li><i class="ti ti-point" style="font-size:10px;margin-top:4px;color:var(--teal-600)"></i>Smaller size reduction than lossy</li>
+            <li><i class="ti ti-point" style="font-size:10px;margin-top:4px;color:var(--teal-600)"></i>Used where quality loss is unacceptable</li>
+            <li><i class="ti ti-point" style="font-size:10px;margin-top:4px;color:var(--teal-600)"></i>Used for: documents, software, archives</li>
+          </ul>
+        </div>
+      </div>
+      <div class="hbox">
+        <p><i class="ti ti-bulb" style="margin-right:6px"></i><strong>Key question to ask:</strong> Can I afford to lose some quality? If yes → Lossy. If no → Lossless.</p>
+      </div>
+    `
+  },
+  {
+    name: "Quick Quiz — Part 1",
+    html: `
+      <p class="slabel">Test yourself — Part 1</p>
+      <p class="stitle">Quick Quiz</p>
+      <div id="quiz-container"></div>
+    `
+  },
+  {
+    name: "Lossy in practice",
+    html: `
+      <p class="slabel">Deeper Understanding</p>
+      <p class="stitle">Lossy Compression in Practice</p>
+      <p class="ssub">Lossy compression trades quality for significant file size savings. Here is how it works across different media types.</p>
+      <div class="grid2" style="margin-bottom:1rem;">
+        <div class="ic blue">
+          <div class="ic-icon"><i class="ti ti-photo"></i></div>
+          <div class="ic-title">JPEG Images</div>
+          <div class="ic-body">Groups similar-coloured pixels together. Reduces colour count, but visual difference is often unnoticeable at normal viewing distance.</div>
+        </div>
+        <div class="ic purple">
+          <div class="ic-icon"><i class="ti ti-music"></i></div>
+          <div class="ic-title">MP3 Audio</div>
+          <div class="ic-body">Removes audio frequencies that human ears are least likely to notice. A 40 MB audio file can become under 4 MB.</div>
+        </div>
+        <div class="ic amber">
+          <div class="ic-icon"><i class="ti ti-video"></i></div>
+          <div class="ic-title">MPEG-4 Video</div>
+          <div class="ic-body">Only stores changes between frames instead of every full frame, dramatically reducing file size.</div>
+        </div>
+        <div class="ic coral">
+          <div class="ic-icon"><i class="ti ti-alert-triangle"></i></div>
+          <div class="ic-title">Trade-off</div>
+          <div class="ic-body">Compression applied multiple times (re-saving a JPEG) causes visible quality loss — called generation loss.</div>
+        </div>
+      </div>
+    `
+  },
+  {
+    name: "Lossless in practice",
+    html: `
+      <p class="slabel">Deeper Understanding</p>
+      <p class="stitle">Lossless Compression in Practice</p>
+      <p class="ssub">Lossless compression encodes repetition and patterns using algorithms. The file can always be restored perfectly.</p>
+      <p style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:8px;">How algorithms find patterns:</p>
+      <ul class="rlist" style="margin-bottom:1rem;">
+        <li><i class="ti ti-repeat" style="color:var(--teal-600);font-size:16px"></i><strong>Run-Length Encoding (RLE):</strong> Repeated characters are replaced by a character and a count. "AAAAA" → "A5"</li>
+        <li><i class="ti ti-code" style="color:var(--teal-600);font-size:16px"></i><strong>Dictionary coding:</strong> Common words or patterns are stored once and referenced by a short code</li>
+        <li><i class="ti ti-file-zip" style="color:var(--teal-600);font-size:16px"></i><strong>ZIP / RAR archives:</strong> Widely used for software and documents where every byte must be preserved</li>
+      </ul>
+      <div class="rle-demo">
+        <div class="rle-before">Original:    AAAAABBBCCDDDDDD &nbsp;(16 characters)</div>
+        <div class="rle-arrow">↓ &nbsp;RLE applied</div>
+        <div class="rle-after">Compressed: A5B3C2D6 &nbsp;(8 characters — 50% smaller)</div>
+      </div>
+      <div class="hbox">
+        <p><i class="ti ti-file-text" style="margin-right:6px"></i>DOCX and PDF documents automatically apply lossless compression when saved. Opening the file decompresses it back to its original state.</p>
+      </div>
+    `
+  },
+  {
+    name: "Spot the difference",
+    html: `
+      <p class="slabel">Activity</p>
+      <p class="stitle">Identify the compression type</p>
+      <p class="ssub">For each scenario below, tap the buttons to reveal whether lossy or lossless should be used — and why.</p>
+      <div id="spot-container"></div>
+    `
+  },
+  {
+    name: "Scenarios",
+    html: `
+      <p class="slabel">Activity</p>
+      <p class="stitle">Compression scenarios</p>
+      <p class="ssub">Choose the best action for each situation below.</p>
+      <div class="scenario-card">
+        <p class="sc-q">1. A photographer wants to store thousands of holiday photos on their phone. Minor quality loss is acceptable. Which type should they use?</p>
+        <div class="sc-opts">
+          <button class="sc-opt" onclick="sc(this,0,true,'Correct! Lossy (e.g. JPEG) dramatically reduces photo file sizes. A slight quality reduction is acceptable for personal photos.')">Lossy compression</button>
+          <button class="sc-opt" onclick="sc(this,0,false,'Lossless would preserve full quality but files would be much larger, using up storage space unnecessarily.')">Lossless compression</button>
+          <button class="sc-opt" onclick="sc(this,0,false,'No compression means files stay large — the photographer could not store as many photos.')">No compression</button>
+        </div>
+        <p class="sc-fb" id="sc-fb-0"></p>
+      </div>
+      <div class="scenario-card">
+        <p class="sc-q">2. A software developer is sending source code files to a colleague over email. Which type should they use?</p>
+        <div class="sc-opts">
+          <button class="sc-opt" onclick="sc(this,1,false,'Lossy compression could permanently corrupt code — a single missing character can break a program.')">Lossy compression</button>
+          <button class="sc-opt" onclick="sc(this,1,true,'Correct! Lossless (e.g. ZIP) preserves every byte of code exactly. Source code cannot afford any data loss.')">Lossless compression</button>
+          <button class="sc-opt" onclick="sc(this,1,false,'The files may be too large to send by email without compression.')">No compression</button>
+        </div>
+        <p class="sc-fb" id="sc-fb-1"></p>
+      </div>
+      <div class="scenario-card">
+        <p class="sc-q">3. A music streaming service wants to allow users to stream songs quickly over mobile data. Which format is most appropriate?</p>
+        <div class="sc-opts">
+          <button class="sc-opt" onclick="sc(this,2,true,'Correct! MP3 uses lossy compression — songs are much smaller so they stream faster. Minor quality loss is acceptable on mobile speakers.')">MP3 (lossy)</button>
+          <button class="sc-opt" onclick="sc(this,2,false,'PNG is an image format, not audio.')">PNG (lossless)</button>
+          <button class="sc-opt" onclick="sc(this,2,false,'Uncompressed audio files are very large and would take too long to stream on mobile networks.')">Uncompressed WAV</button>
+        </div>
+        <p class="sc-fb" id="sc-fb-2"></p>
+      </div>
+    `
+  },
+  {
+    name: "Exam command words",
+    html: `
+      <p class="slabel">Exam preparation</p>
+      <p class="stitle">Exam command words</p>
+      <p class="ssub">Know what each command word is asking you to do — it changes how you structure your answer.</p>
+      <div class="grid2" style="margin-bottom:1rem;">
+        <div class="ic blue">
+          <div class="ic-title"><i class="ti ti-list" style="margin-right:5px"></i>State / Identify</div>
+          <div class="ic-body" style="margin-top:6px;">Give a fact with no explanation. Usually 1 mark each.<br><br><em>"State one file format that uses lossy compression."</em></div>
+        </div>
+        <div class="ic teal">
+          <div class="ic-title"><i class="ti ti-info-circle" style="margin-right:5px"></i>Describe</div>
+          <div class="ic-body" style="margin-top:6px;">Say what something is or how it works. A sentence or two.<br><br><em>"Describe what is meant by lossless compression."</em></div>
+        </div>
+        <div class="ic amber">
+          <div class="ic-title"><i class="ti ti-bulb" style="margin-right:5px"></i>Explain</div>
+          <div class="ic-body" style="margin-top:6px;">Give a reason or cause — use "because" or "so that".<br><br><em>"Explain why lossy compression is not suitable for legal documents."</em></div>
+        </div>
+        <div class="ic purple">
+          <div class="ic-title"><i class="ti ti-scale" style="margin-right:5px"></i>Discuss / Evaluate</div>
+          <div class="ic-body" style="margin-top:6px;">Give advantages AND disadvantages. Both sides needed.<br><br><em>"Discuss the use of lossy compression for storing images."</em></div>
+        </div>
+      </div>
+      <div class="hbox">
+        <p><i class="ti ti-pencil" style="margin-right:6px"></i><strong>Top tip:</strong> For "explain" questions, always link your point to a consequence using "because" or "so that". <em>"Lossless is used for documents because all data must be preserved exactly, so no information is lost."</em></p>
+      </div>
+    `
+  },
+  {
+    name: "Exam practice",
+    html: `
+      <p class="slabel">Exam preparation</p>
+      <p class="stitle">Past paper–style practice</p>
+      <p class="ssub">Read each question, write your answer, then tap to reveal the mark scheme.</p>
+      <div id="eq-container"></div>
+    `
+  },
+  {
+    name: "Key terms",
+    html: `
+      <p class="slabel">Revision</p>
+      <p class="stitle">Key terms glossary</p>
+      <p class="ssub">Tap any term to see its definition.</p>
+      <div id="glossary-container"></div>
+    `
+  },
+  {
+    name: "Quiz — Part 2",
+    html: `
+      <p class="slabel">Test yourself — Part 2</p>
+      <p class="stitle">Quiz: apply your knowledge</p>
+      <div id="quiz2-container"></div>
+    `
+  },
+  {
+    name: "Summary checklist",
+    html: `
+      <p class="slabel">All done!</p>
+      <p class="stitle">Topic checklist</p>
+      <p class="ssub">Make sure you are confident on every area before your exam.</p>
+      <div class="checklist">
+        ${[
+          ["What compression is and why it is needed","blue"],
+          ["The difference between lossy and lossless","teal"],
+          ["Lossy: data removed permanently, irreversible","coral"],
+          ["Lossless: data encoded, fully reversible","teal"],
+          ["Run-Length Encoding (RLE) and how it works","blue"],
+          ["Lossy file formats: JPEG, MP3, MPEG-4","amber"],
+          ["Lossless file formats: PNG, ZIP, RAR","green"],
+          ["Choosing the right type for a given scenario","purple"],
+          ["Exam command words: state, describe, explain, discuss","gray"],
+        ].map(([t,c])=>`<div class="check-item ${c}"><i class="ti ti-circle-check" style="font-size:18px;flex-shrink:0"></i><span>${t}</span></div>`).join('')}
+      </div>
+      <div id="final-scores" style="margin-top:1.5rem;"></div>
+    `
+  }
+];
+
+const quiz1 = [
+  {q:"What is the main difference between lossy and lossless compression?",opts:["Lossy is faster to apply than lossless","Lossy permanently removes data; lossless encodes data and is reversible","Lossless is only used for images","Lossy can only be used on text files"],correct:1,explain:"Lossy removes data permanently (irreversible). Lossless encodes data using patterns and can be fully reversed."},
+  {q:"Which of the following is a lossy file format?",opts:[".PNG",".ZIP",".RAR",".MP3"],correct:3,explain:"MP3 is a lossy audio format. PNG, ZIP and RAR all use lossless compression."},
+  {q:"Why is lossless compression used for text documents?",opts:["It produces smaller files than lossy","It is faster to compress","All data must be preserved exactly — any loss would corrupt the document","It uses less processing power"],correct:2,explain:"Documents require every character to be preserved exactly. Any data loss could corrupt the content or change its meaning."},
+  {q:"A user saves a JPEG image. What happens to the original data?",opts:["It is encoded and can be restored","It is permanently removed and cannot be recovered","It is stored in a separate backup file","Nothing — JPEG is lossless"],correct:1,explain:"JPEG uses lossy compression, which permanently removes data. The original cannot be restored once saved as JPEG."},
+  {q:"What does Run-Length Encoding (RLE) do?",opts:["Removes all repeated characters","Replaces sequences of repeated characters with a character and a count","Converts data to binary","Encrypts data for security"],correct:1,explain:"RLE replaces runs of identical characters with the character and how many times it repeats. E.g. AAAAA becomes A5."},
+];
+
+const quiz2 = [
+  {q:"Which file format would be most suitable for a medical X-ray image where quality must be preserved perfectly?",opts:[".JPEG",".MP3",".PNG",".MPEG-4"],correct:2,explain:"PNG uses lossless compression — the image can be decompressed to its exact original state, preserving every detail needed for diagnosis."},
+  {q:"A string 'BBBBBCCDDDDDD' is compressed using RLE. What is the result?",opts:["B5C2D6","B5CD6","BBCDD","B5C1C1D6"],correct:0,explain:"B appears 5 times, C appears 2 times, D appears 6 times → B5C2D6."},
+  {q:"Which of these is an advantage of lossy compression over lossless?",opts:["The original file can always be restored","It is suitable for legal documents","It achieves a much greater reduction in file size","It preserves full quality"],correct:2,explain:"Lossy compression achieves a far greater reduction in file size than lossless, making it ideal for media like photos and music where some quality loss is acceptable."},
+  {q:"A video streaming website uses MPEG-4. Why is this appropriate?",opts:["MPEG-4 is lossless so quality is preserved","MPEG-4 compresses video files so they stream faster over the internet","MPEG-4 encrypts the video for security","MPEG-4 improves video resolution"],correct:1,explain:"MPEG-4 uses lossy compression to significantly reduce video file sizes, allowing faster streaming. Minor quality loss is acceptable for video."},
+];
+
+const examQs = [
+  {q:"State two reasons why a file might need to be compressed before being sent over the internet. [2]",marks:"1 mark each for any two of:\n• To minimise transfer / upload / download time (1)\n• To reduce the amount of bandwidth used (1)\n• To allow more data to be sent in the same time (1)\n• To reduce storage requirements on the receiving device (1)"},
+  {q:"Describe the difference between lossy and lossless compression. [3]",marks:"• Lossy compression permanently removes / deletes data (1)\n• Lossless compression encodes data / no data is permanently removed (1)\n• Lossless is reversible — the original file can be fully restored; lossy cannot (1)\n• Lossy achieves a greater reduction in file size than lossless (1)\nMax 3 marks"},
+  {q:"Explain why lossless compression is more suitable than lossy compression for a text document. [2]",marks:"• Lossless compression preserves all data exactly (1)\n• Because any data loss in a document could corrupt the content / change the meaning / make it unreadable (1)"},
+  {q:"A student uses Run-Length Encoding (RLE) to compress the string 'AAAAAABBBCCCCC'.\n(a) Write the compressed version. [1]\n(b) Explain why RLE is a form of lossless compression. [2]",marks:"(a) A6B3C5 (1) — accept variations with correct counts\n(b) No data is permanently removed (1); the original string can be fully reconstructed from the compressed version / the process is reversible (1)"},
+];
+
+const glossary = [
+  {t:"Compression",d:"The process of reducing the size of a file so it can be stored more efficiently or transmitted more quickly."},
+  {t:"Lossy compression",d:"A compression method that permanently removes data to reduce file size. The process is irreversible — the original cannot be restored."},
+  {t:"Lossless compression",d:"A compression method that encodes data to reduce file size without permanently removing anything. The original file can be fully restored by decompression."},
+  {t:"Run-Length Encoding (RLE)",d:"A lossless compression algorithm that replaces sequences of repeated characters with the character and a count. E.g. AAAAA → A5."},
+  {t:"Irreversible",d:"Cannot be undone. Lossy compression is irreversible — once data is removed, it cannot be recovered."},
+  {t:"Reversible",d:"Can be undone. Lossless compression is reversible — decompression restores the file to its exact original state."},
+  {t:"JPEG",d:"A lossy image format. Reduces file size by grouping similar-coloured pixels together. Quality is reduced but the visual difference is often minimal."},
+  {t:"MP3",d:"A lossy audio format. Reduces file size by removing audio frequencies that humans are least likely to notice."},
+  {t:"PNG",d:"A lossless image format. The full image data is preserved. Larger file size than JPEG but no quality loss."},
+  {t:"Colour depth",d:"The number of bits used to represent each pixel's colour. Reducing colour depth reduces image file size."},
+];
+
+const spotScenarios = [
+  {label:"Storing holiday photos on a phone",type:"Lossy",reason:"Minor quality loss in personal photos is acceptable. Lossy (JPEG) dramatically reduces file sizes, letting you store many more photos.",color:"coral"},
+  {label:"Sending a Word document by email",type:"Lossless",reason:"All document data must be preserved exactly. Any data loss could corrupt the content or change the meaning.",color:"teal"},
+  {label:"Streaming music over the internet",type:"Lossy",reason:"MP3 files are much smaller than uncompressed audio. A small reduction in audio quality is acceptable for streaming.",color:"coral"},
+  {label:"Archiving software source code",type:"Lossless",reason:"Source code cannot lose any data — even a single missing character can break a program. ZIP/RAR preserve everything exactly.",color:"teal"},
+  {label:"Uploading a video to a website",type:"Lossy",reason:"MPEG-4 compresses video files significantly so they upload and stream quickly. Minor visual quality loss is generally acceptable.",color:"coral"},
+  {label:"Backing up a database file",type:"Lossless",reason:"Every record in a database must be preserved perfectly. Any data loss could corrupt or lose records.",color:"teal"},
+];
+let spotRevealed = {};
+
+let cur = 0;
+let q1Answers = {}, q2Answers = {};
+let q1Score = 0, q2Score = 0;
+let scDone = {};
+
+function renderProgress() {
+  const fill = ((cur + 1) / slides.length * 100).toFixed(1);
+  document.getElementById('prog-fill').style.width = fill + '%';
+  document.getElementById('slide-name').textContent = slides[cur].name;
+  document.getElementById('slide-frac').textContent = (cur + 1) + ' / ' + slides.length;
+  document.getElementById('nav-ctr').textContent = (cur + 1) + ' / ' + slides.length;
+  const dots = document.getElementById('slide-dots');
+  dots.innerHTML = slides.map((s, i) => `<div class="sdot ${i < cur ? 'done' : i === cur ? 'active' : ''}" title="${s.name}" onclick="goTo(${i})"></div>`).join('');
+}
+
+function renderSlide() {
+  const wrap = document.getElementById('slides-wrap');
+  wrap.innerHTML = `<div class="slide visible">${slides[cur].html}</div>`;
+  if (cur === 4) renderQuiz('quiz-container', quiz1, q1Answers, 1);
+  if (cur === 7) renderSpot();
+  if (cur === 10) renderExamQs();
+  if (cur === 11) renderGlossary();
+  if (cur === 12) renderQuiz('quiz2-container', quiz2, q2Answers, 2);
+  if (cur === 13) renderFinalScores();
+  document.getElementById('prev-btn').disabled = cur === 0;
+  document.getElementById('next-btn').disabled = cur === slides.length - 1;
+  renderProgress();
+}
+
+function renderQuiz(containerId, questions, answers, quizNum) {
+  const c = document.getElementById(containerId);
+  if (!c) return;
+  let html = '<div class="quiz-nav">';
+  questions.forEach((_, i) => {
+    let cls = '';
+    if (answers[i] !== undefined) cls = answers[i] === questions[i].correct ? 'q-done-right' : 'q-done-wrong';
+    html += `<button class="qnav-btn ${cls}" onclick="showQ('${containerId}',${i},${quizNum})">${i + 1}</button>`;
+  });
+  html += '</div><div id="' + containerId + '-qdisplay"></div>';
+  c.innerHTML = html;
+  showQ(containerId, 0, quizNum);
+}
+
+function showQ(containerId, i, quizNum) {
+  const questions = quizNum === 1 ? quiz1 : quiz2;
+  const answers = quizNum === 1 ? q1Answers : q2Answers;
+  const d = questions[i];
+  const answered = answers[i] !== undefined;
+  let html = `<p style="font-size:16px;font-weight:600;color:var(--text);margin-bottom:1rem;">${i + 1}. ${d.q}</p>`;
+  d.opts.forEach((opt, j) => {
+    let cls = 'qbtn';
+    if (answered) {
+      if (j === d.correct) cls += ' correct';
+      else if (j === answers[i]) cls += ' wrong';
+      cls += ' disabled';
+    }
+    html += `<button class="${cls}" onclick="${answered ? '' : `answerQ('${containerId}',${i},${j},${quizNum})`}">${opt}</button>`;
+  });
+  if (answered) {
+    const ok = answers[i] === d.correct;
+    html += `<div class="feedback show ${ok ? 'ok' : 'no'}">${ok ? '✓ Correct! ' : '✗ Not quite. '}${d.explain}</div>`;
+  }
+  document.getElementById(containerId + '-qdisplay').innerHTML = html;
+}
+
+function answerQ(containerId, qi, ai, quizNum) {
+  const questions = quizNum === 1 ? quiz1 : quiz2;
+  const answers = quizNum === 1 ? q1Answers : q2Answers;
+  if (answers[qi] !== undefined) return;
+  answers[qi] = ai;
+  if (ai === questions[qi].correct) {
+    if (quizNum === 1) q1Score++; else q2Score++;
+  }
+  renderQuiz(containerId, questions, answers, quizNum);
+  showQ(containerId, qi, quizNum);
+}
+
+function renderSpot() {
+  const c = document.getElementById('spot-container');
+  if (!c) return;
+  c.innerHTML = spotScenarios.map((s, i) => `
+    <div style="border:.5px solid var(--border);border-radius:var(--radius-md);padding:.875rem 1rem;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+      <span style="font-size:14px;color:var(--text);flex:1;">${s.label}</span>
+      <button class="clue-btn info" id="spot-btn-${i}" onclick="revealSpot(${i})" style="flex-shrink:0;">
+        <i class="ti ti-eye"></i> Reveal
+      </button>
+    </div>
+    <div class="clue-res" id="spot-res-${i}" style="margin-bottom:8px;"></div>
+  `).join('');
+}
+
+function revealSpot(i) {
+  const s = spotScenarios[i];
+  const btn = document.getElementById('spot-btn-' + i);
+  const res = document.getElementById('spot-res-' + i);
+  btn.classList.add('selected');
+  btn.innerHTML = `<i class="ti ti-check"></i> ${s.type}`;
+  res.className = 'clue-res show';
+  const isLossy = s.type === 'Lossy';
+  res.style.cssText = isLossy
+    ? 'background:var(--coral-50);border:.5px solid var(--coral-200);color:var(--coral-800);'
+    : 'background:var(--teal-50);border:.5px solid var(--teal-200);color:var(--teal-800);';
+  res.innerHTML = `<strong>${s.type}</strong> — ${s.reason}`;
+}
+
+function renderExamQs() {
+  const c = document.getElementById('eq-container');
+  if (!c) return;
+  c.innerHTML = examQs.map((q, i) => `
+    <div class="exam-q-card">
+      <p class="exam-q-text">${q.q.replace(/\n/g,'<br>')}</p>
+      <textarea class="exam-textarea" placeholder="Write your answer here..."></textarea>
+      <button class="reveal-btn" onclick="toggleMS('ms-${i}',this)"><i class="ti ti-eye" style="font-size:14px"></i> Show mark scheme</button>
+      <div class="ms-box" id="ms-${i}">${q.marks.replace(/\n/g,'<br>').replace(/•/g,'<span class="ms-point">')}</div>
+    </div>
+  `).join('');
+}
+
+function toggleMS(id, btn) {
+  const el = document.getElementById(id);
+  const open = el.classList.contains('show');
+  el.classList.toggle('show', !open);
+  btn.innerHTML = open
+    ? '<i class="ti ti-eye" style="font-size:14px"></i> Show mark scheme'
+    : '<i class="ti ti-eye-off" style="font-size:14px"></i> Hide mark scheme';
+}
+
+function renderGlossary() {
+  const c = document.getElementById('glossary-container');
+  if (!c) return;
+  c.innerHTML = glossary.map((g, i) => `
+    <div class="accordion-item">
+      <button class="accordion-btn" onclick="toggleAcc('g${i}','g-ic${i}')">
+        <span class="acc-title">${g.t}</span>
+        <i class="ti ti-chevron-down acc-icon" id="g-ic${i}"></i>
+      </button>
+      <div class="acc-body def" id="g${i}"><p>${g.d}</p></div>
+    </div>
+  `).join('');
+}
+
+function toggleAcc(bodyId, iconId) {
+  const body = document.getElementById(bodyId);
+  const icon = document.getElementById(iconId);
+  const open = body.style.display === 'block';
+  body.style.display = open ? 'none' : 'block';
+  icon.style.transform = open ? '' : 'rotate(180deg)';
+}
+
+function renderFinalScores() {
+  const c = document.getElementById('final-scores');
+  if (!c) return;
+  const total = q1Score + q2Score;
+  const max = quiz1.length + quiz2.length;
+  c.innerHTML = `
+    <div class="score-box">
+      <div class="score-num">${total}/${max}</div>
+      <div class="score-lbl">Total quiz score &nbsp;·&nbsp; Quiz 1: ${q1Score}/${quiz1.length} &nbsp;·&nbsp; Quiz 2: ${q2Score}/${quiz2.length}</div>
+    </div>
+  `;
+}
+
+function sc(btn, idx, correct, explain) {
+  if (scDone[idx]) return;
+  scDone[idx] = true;
+  btn.classList.add(correct ? 'right' : 'wrong');
+  btn.parentElement.querySelectorAll('.sc-opt').forEach(s => { s.style.pointerEvents = 'none'; });
+  const fb = document.getElementById('sc-fb-' + idx);
+  if (fb) { fb.className = 'sc-fb show'; fb.style.color = correct ? 'var(--green-800)' : 'var(--coral-800)'; fb.textContent = (correct ? '✓ ' : '✗ ') + explain; }
+}
+
+function navigate(dir) {
+  cur = Math.max(0, Math.min(slides.length - 1, cur + dir));
+  scDone = {}; spotRevealed = {};
+  renderSlide();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function goTo(i) {
+  cur = i;
+  scDone = {}; spotRevealed = {};
+  renderSlide();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+renderSlide();
+</script>
+</body>
+</html>
